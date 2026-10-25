@@ -76,9 +76,10 @@ For an RTX 4060 Laptop `10de:28a0`, use its own experimental flag instead:
 gpu_unlock.targets=0000:01:00.0 gpu_unlock.ad107_experimental=1
 ```
 
-On a laptop, also set `options nvidia NVreg_DynamicPowerManagement=0x00` in
-`/etc/modprobe.d/`. Runtime D3 clears the unlock when the dGPU powers off.
-A full AC power cut is not required when a warm reboot already shows
+Set `options nvidia NVreg_DynamicPowerManagement=0x00` only if that platform
+can runtime-D3 the dGPU. One AC-powered `28a0` host had no GPU `_PR3` and did
+not need it; see the [28a0 conclusions](docs/ada-28a0-conclusions.md). A full
+AC power cut is not required when a warm reboot already shows
 `gpu_unlock: unlocked` and full-rate readbacks.
 
 For an RTX 4090 `10de:2684`, only the first option is needed:

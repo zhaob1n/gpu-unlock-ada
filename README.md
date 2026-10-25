@@ -90,9 +90,11 @@ same-card stock throughput run has been made yet. See the
 [2805 report](docs/ada-2805-report.md).
 RTX 4060 Laptop `10de:28a0` is an **experimental AD107M target**. It uses the
 same AD102-family payload and requires both `gpu_unlock.ad107_experimental=1`
-and one exact PCI address; `targets=all` never selects it. On a laptop, set
-`options nvidia NVreg_DynamicPowerManagement=0x00`. Runtime D3 powers the dGPU
-off when idle and clears these volatile selectors.
+and one exact PCI address; `targets=all` never selects it. One AC-powered host
+showed about 2× FP16→FP32 and TF32→FP32 instruction rate; UINT4 did not change.
+See the [28a0 conclusions](docs/ada-28a0-conclusions.md). Do not assume
+`NVreg_DynamicPowerManagement=0x00` is required: that host kept the unlock with
+the driver default of `3`.
 
 Other Ada IDs, professional RTX A-series and data-centre parts are not accepted.
 Shared firmware across Ada chips does not establish support for untested cards.
