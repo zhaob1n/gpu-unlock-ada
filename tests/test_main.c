@@ -204,6 +204,7 @@ static void reset(char *list)
 	targets = list;
 	ad103_experimental = false;
 	ad106_experimental = false;
+	ad107_experimental = false;
 }
 
 /* Runs init, then checks what holds for every case. */
@@ -354,6 +355,30 @@ int main(void)
 	run();
 	assert(fake.loads == 1 && fake.started == 1 && fake.unlocks[0]);
 	puts("ad106: gated exact-card dispatch PASS");
+
+	/* AD107M 0x28a0 needs its own flag and exactly one BDF. */
+	reset("0000:01:00.0");
+	add("0000:01:00.0", GU_AD107_RTX_4060_LAPTOP, false);
+	run();
+	assert(!fake.loads && !fake.started);
+	reset("all");
+	ad107_experimental = true;
+	add("0000:01:00.0", GU_AD107_RTX_4060_LAPTOP, false);
+	run();
+	assert(!fake.loads && !fake.started);
+	assert(logged("experimental AD107 requires a single exact PCI target"));
+	reset("0000:01:00.0");
+	ad107_experimental = true;
+	add("0000:01:00.0", GU_AD107_RTX_4060_LAPTOP, false);
+	fake.expected_concurrent = 1;
+	run();
+	assert(fake.loads == 1 && fake.started == 1 && fake.unlocks[0]);
+	reset("0000:01:00.0");
+	ad107_experimental = true;
+	add("0000:01:00.0", 0x28a1, false);
+	run();
+	assert(!fake.loads && !fake.started);
+	puts("ad107: gated exact-card dispatch PASS");
 
 	/* No opt-in on the command line: the module does nothing. */
 	for (int empty = 0; empty < 2; empty++) {

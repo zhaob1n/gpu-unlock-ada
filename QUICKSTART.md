@@ -4,7 +4,9 @@ This guide is for a Linux machine you control. The RTX 4070 Ti SUPER path is
 experimental and has been tested on **one** `10de:2705` card. RTX 4090
 `10de:2684` has a separate [single-card report](rtx4090-register-report.md).
 RTX 4060 Ti 16GB `10de:2805` is experimental and has been unlocked on **one**
-card ([2805 report](docs/ada-2805-report.md)). Other Ada IDs are not enabled. The measured instruction-rate gain is for
+card ([2805 report](docs/ada-2805-report.md)). RTX 4060 Laptop `10de:28a0` is
+experimental: same AD102 payload, exact PCI address, and
+`gpu_unlock.ad107_experimental=1`. Other Ada IDs are not enabled. The measured instruction-rate gain is for
 FP16, BF16 and TF32 tensor work with FP32 accumulation. INT8 and unsigned
 INT4 did not speed up in the 2705 tests. One matched FP8/FP32 GEMM was
 effectively unchanged (59.326 → 59.495 TF/s).
@@ -17,7 +19,8 @@ lspci -Dnn | grep -i nvidia
 
 Find the line for your GPU. The full address is the first field, such as
 `0000:01:00.0`. Confirm the device ID is `10de:2705` for the experimental
-RTX 4070 Ti SUPER path, `10de:2805` for the experimental RTX 4060 Ti 16GB path
+RTX 4070 Ti SUPER path, `10de:2805` for the experimental RTX 4060 Ti 16GB path,
+`10de:28a0` for the experimental RTX 4060 Laptop path,
 or `10de:2684` for the RTX 4090 path. Keep this address
 for step 3. On a multi-GPU host, identify the exact intended card; do not use
 `targets=all` for an Ada test.
@@ -66,6 +69,17 @@ For an RTX 4060 Ti 16GB `10de:2805`, use its own experimental flag instead:
 ```text
 gpu_unlock.targets=0000:01:00.0 gpu_unlock.ad106_experimental=1
 ```
+
+For an RTX 4060 Laptop `10de:28a0`, use its own experimental flag instead:
+
+```text
+gpu_unlock.targets=0000:01:00.0 gpu_unlock.ad107_experimental=1
+```
+
+On a laptop, also set `options nvidia NVreg_DynamicPowerManagement=0x00` in
+`/etc/modprobe.d/`. Runtime D3 clears the unlock when the dGPU powers off.
+A full AC power cut is not required when a warm reboot already shows
+`gpu_unlock: unlocked` and full-rate readbacks.
 
 For an RTX 4090 `10de:2684`, only the first option is needed:
 
